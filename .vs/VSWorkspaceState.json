@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Client",
+    "\\Client\\css",
+    "\\Client\\images",
+    "\\Client\\js",
+    "\\Controllers",
+    "\\Models",
+    "\\Services",
+    "\\Views",
+    "\\Views\\Shared"
+  ],
+  "SelectedNode": "\\Views\\Chat\\Index.aspx",
+  "PreviewInSolutionExplorer": false
+}
