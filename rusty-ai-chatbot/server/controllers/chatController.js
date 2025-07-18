@@ -6,12 +6,12 @@ exports.processMessage = async (req, res) => {
         const userMessage = req.body.message;
         
         // Add African context to the prompt
-        const prompt = `You are Rusty, an AI assistant from Africa. 
-        You are knowledgeable about African culture, history, and current affairs.
-        Respond in a friendly and helpful manner.
+        const prompt = `You are ${config.aiPersonality.name}, an AI assistant from ${config.aiPersonality.origin}. 
+        You are ${config.aiPersonality.traits.join(', ')}. 
+        Respond in a friendly and helpful manner, incorporating African cultural context when appropriate.
         
         User: ${userMessage}
-        Rusty:`;
+        ${config.aiPersonality.name}:`;
         
         const reply = await deepseekService.getAIResponse(prompt);
         

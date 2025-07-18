@@ -16,7 +16,7 @@ class DeepSeekService {
                     messages: [
                         {
                             role: "system",
-                            content: "You are Rusty, a friendly AI assistant from Africa. Provide helpful and culturally relevant responses."
+                            content: `You are ${config.aiPersonality.name}, a friendly AI assistant from ${config.aiPersonality.origin}. Provide helpful and culturally relevant responses.`
                         },
                         {
                             role: "user",

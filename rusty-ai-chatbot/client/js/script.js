@@ -1,28 +1,95 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const loadingScreen = document.getElementById('loading-screen');
+    const chatContainer = document.getElementById('chat-container');
     const chatMessages = document.getElementById('chat-messages');
     const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
+    const sendButton = document.getElementById('send-button');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const themeToggle = document.getElementById('theme-toggle');
+    const messageCount = document.getElementById('message-count');
+    const messageCountSpan = messageCount.querySelector('span');
     
-    // Initial greeting
-    addBotMessage("Jambo! I'm Rusty, your African AI assistant. How can I help you today?");
+    // Variables
+    let messageCounter = 0;
+    let currentTheme = localStorage.getItem('theme') || 'light';
     
-    // Send message when button is clicked
-    sendBtn.addEventListener('click', sendMessage);
+    // Initialize the app
+    function init() {
+        // Set theme
+        setTheme(currentTheme);
+        
+        // Simulate loading
+        setTimeout(() => {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                chatContainer.style.opacity = '1';
+            }, 500);
+        }, 2000);
+        
+        // Add event listeners
+        setupEventListeners();
+        
+        // Auto-resize textarea
+        autoResizeTextarea();
+    }
     
-    // Send message when Enter key is pressed
-    userInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            sendMessage();
+    // Set theme
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        
+        // Update toggle icon
+        if (theme === 'dark') {
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            themeToggle.title = 'Toggle Light Mode';
+        } else {
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            themeToggle.title = 'Toggle Dark Mode';
         }
-    });
+    }
     
+    // Toggle theme
+    function toggleTheme() {
+        currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+        setTheme(currentTheme);
+    }
+    
+    // Auto-resize textarea
+    function autoResizeTextarea() {
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
+    
+    // Setup event listeners
+    function setupEventListeners() {
+        // Send message on button click
+        sendButton.addEventListener('click', sendMessage);
+        
+        // Send message on Enter key (but allow Shift+Enter for new line)
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // Theme toggle
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    // Send message
     function sendMessage() {
         const message = userInput.value.trim();
         if (message === '') return;
         
         // Add user message to chat
-        addUserMessage(message);
+        addMessage(message, 'user');
         userInput.value = '';
+        userInput.style.height = 'auto';
         
         // Show typing indicator
         showTypingIndicator();
@@ -38,58 +105,61 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             // Remove typing indicator
-            removeTypingIndicator();
+            hideTypingIndicator();
             
             if (data.reply) {
-                addBotMessage(data.reply);
+                addMessage(data.reply, 'bot');
             } else {
-                addBotMessage("Sorry, I encountered an error. Please try again.");
+                addMessage("Sorry, I encountered an error. Please try again.", 'bot');
             }
         })
         .catch(error => {
-            removeTypingIndicator();
-            addBotMessage("Oops! Something went wrong. Please check your connection and try again.");
+            hideTypingIndicator();
+            addMessage("Oops! Something went wrong. Please check your connection and try again.", 'bot');
             console.error('Error:', error);
         });
     }
     
-    function addUserMessage(message) {
+    // Add message to chat
+    function addMessage(content, sender) {
         const messageElement = document.createElement('div');
-        messageElement.classList.add('message', 'user-message');
-        messageElement.textContent = message;
-        chatMessages.appendChild(messageElement);
-        scrollToBottom();
-    }
-    
-    function addBotMessage(message) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', 'bot-message');
-        messageElement.textContent = message;
-        chatMessages.appendChild(messageElement);
-        scrollToBottom();
-    }
-    
-    function showTypingIndicator() {
-        const typingElement = document.createElement('div');
-        typingElement.classList.add('typing-indicator');
-        typingElement.id = 'typing-indicator';
-        typingElement.innerHTML = `
-            <span></span>
-            <span></span>
-            <span></span>
+        messageElement.classList.add('message', `${sender}-message`);
+        
+        const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        messageElement.innerHTML = `
+            <div class="message-content">
+                <p>${content.replace(/\n/g, '<br>')}</p>
+            </div>
+            <div class="message-timestamp">${timestamp}</div>
         `;
-        chatMessages.appendChild(typingElement);
+        
+        chatMessages.appendChild(messageElement);
         scrollToBottom();
-    }
-    
-    function removeTypingIndicator() {
-        const typingElement = document.getElementById('typing-indicator');
-        if (typingElement) {
-            typingElement.remove();
+        
+        // Update message counter
+        if (sender === 'user') {
+            messageCounter++;
+            messageCountSpan.textContent = messageCounter;
         }
     }
     
+    // Show typing indicator
+    function showTypingIndicator() {
+        typingIndicator.style.display = 'block';
+        scrollToBottom();
+    }
+    
+    // Hide typing indicator
+    function hideTypingIndicator() {
+        typingIndicator.style.display = 'none';
+    }
+    
+    // Scroll to bottom of chat
     function scrollToBottom() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+    
+    // Initialize the app
+    init();
 });
