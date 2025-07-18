@@ -41,3 +41,25 @@ Rusty is an African AI assistant built with HTML5, CSS3, JavaScript, Node.js, an
    - Implement rate limiting
    - Set up proper logging
    - Use a process manager like PM2
+  
+## Structure
+
+      rusty-ai-chatbot/
+      ├── client/
+      │   ├── css/
+      │   │   └── style.css
+      │   ├── js/
+      │   │   └── script.js
+      │   ├── images/
+      │   └── index.html
+      ├── server/
+      │   ├── app.js
+      │   ├── config.js
+      │   ├── controllers/
+      │   │   └── chatController.js
+      │   ├── routes/
+      │   │   └── api.js
+      │   └── services/
+      │       └── deepseekService.js
+      ├── .gitignore
+      └── package.json
